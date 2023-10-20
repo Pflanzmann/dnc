@@ -1,8 +1,6 @@
-use std::cell::RefCell;
 use std::rc::Rc;
 use crate::models::item::Item;
 use crate::storage::local_item_storage::LocalItemStorage;
-use crate::storage::storage::ItemStorage;
 
 pub struct UiState {
     local_item_storage: Rc<LocalItemStorage>,

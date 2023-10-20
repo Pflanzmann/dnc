@@ -3,12 +3,11 @@ use std::io;
 use std::io::{BufWriter, Read, Write};
 
 use crate::models::item::Item;
-use crate::storage::storage::ItemStorage;
 
 pub struct LocalItemStorage;
 
-impl ItemStorage for LocalItemStorage {
-    fn store_items(&self, items: &Vec<Item>) -> io::Result<()> {
+impl LocalItemStorage {
+    pub fn store_items(&self, items: &Vec<Item>) -> io::Result<()> {
         let data = serde_json::to_string(items)
             .map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?;
 
@@ -19,7 +18,7 @@ impl ItemStorage for LocalItemStorage {
         Ok(())
     }
 
-    fn load_items(&self) -> io::Result<Vec<Item>> {
+    pub fn load_items(&self) -> io::Result<Vec<Item>> {
         let mut file = File::open("stored_items.json")?;
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;

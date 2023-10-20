@@ -5,7 +5,6 @@ use eframe::*;
 
 use crate::models::ui_state::UiState;
 use crate::storage::local_item_storage::LocalItemStorage;
-use crate::storage::storage::ItemStorage;
 use crate::ui::input_panel::InputPanel;
 use crate::ui::prepared_panel::PreparedPanel;
 use crate::ui::storage_panel::StoragePanel;
@@ -15,15 +14,15 @@ mod ui;
 mod storage;
 
 fn main() {
-    let options = eframe::NativeOptions {
+    let options = NativeOptions {
         initial_window_size: Some(egui::vec2(2000.0, 1000.0)),
         ..Default::default()
     };
 
-    eframe::run_native(
+    run_native(
         "My egui App",
         options,
-        Box::new(|cc| {
+        Box::new(|_| {
             Box::new(MyApp::new())
         }),
     ).unwrap();
@@ -63,14 +62,16 @@ impl App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut Frame) {
         egui::CentralPanel::default()
             .show(ctx, |ui| {
-                ui.horizontal(|ui| {
+                ui.horizontal_centered(|ui| {
+                    let width = ui.ctx().screen_rect().width();
+
                     self.input_panel.show(ui);
 
-                    ui.add_space(50f32);
+                    ui.add_space(width * 0.01f32);
 
                     self.storage_panel.show(ui);
 
-                    ui.add_space(50f32);
+                    ui.add_space(width * 0.01f32);
 
                     self.prepared_panel.show(ui);
                 })

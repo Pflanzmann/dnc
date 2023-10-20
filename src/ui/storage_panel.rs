@@ -12,16 +12,19 @@ pub struct StoragePanel {
 impl StoragePanel {
     pub fn show(&mut self, ui: &mut egui::Ui) {
         ui.vertical(|ui| {
-            ui.set_width(600f32);
-            ui.set_height(800f32);
-            ui.set_max_height(800f32);
             ui.label("Available Items");
 
-            ScrollArea::vertical()
-                .id_source("Available")
-                .auto_shrink([false; 2])
-                .show_viewport(ui, |ui, viewport| {
-                    ui.group(|ui| {
+            ui.group(|ui| {
+                let width = ui.ctx().screen_rect().width();
+                let height = ui.ctx().screen_rect().height();
+
+                ui.set_width(width * 0.3f32);
+                ui.set_height(height * 0.9f32);
+
+                ScrollArea::vertical()
+                    .id_source("Available")
+                    .auto_shrink([false; 2])
+                    .show_viewport(ui, |ui, viewport| {
                         let mut item_to_chose: Option<usize> = None;
                         let mut item_to_delete: Option<usize> = None;
 
@@ -56,7 +59,7 @@ impl StoragePanel {
                             self.ui_state.borrow_mut().remove_stored_items(index);
                         }
                     });
-                });
+            });
         });
     }
 
