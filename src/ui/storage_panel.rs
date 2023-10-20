@@ -35,19 +35,21 @@ impl StoragePanel {
                                 ui.label(&item.rarity);
                                 ui.label(&item.description);
                                 ui.label(&item.flavor);
+
+                                ui.add_space(10f32);
+
+                                ui.horizontal(|ui| {
+                                    if ui.button("Delete").clicked() {
+                                        item_to_delete = Some(index);
+                                    }
+
+                                    if ui.button("Chose").clicked() {
+                                        item_to_chose = Some(index);
+                                    }
+                                });
                             });
 
                             ui.add_space(30f32);
-
-                            ui.horizontal(|ui| {
-                                if ui.button("Delete").clicked() {
-                                    item_to_delete = Some(index);
-                                }
-
-                                if ui.button("Chose").clicked() {
-                                    item_to_chose = Some(index);
-                                }
-                            });
                         }
 
                         if let Some(index) = item_to_chose {

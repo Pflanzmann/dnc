@@ -130,8 +130,6 @@ impl InputPanel {
         });
     }
 
-    fn preview(&mut self, ui: &mut egui::Ui) {}
-
     pub fn new(ui_state: Rc<RefCell<UiState>>) -> Self {
         let current_path = env::current_dir();
 

@@ -25,35 +25,37 @@ impl PreparedPanel {
                     .id_source("Chosen")
                     .auto_shrink([false; 2])
                     .show_viewport(ui, |ui, viewport| {
-                            let mut item_to_delete: Option<usize> = None;
+                        let mut item_to_delete: Option<usize> = None;
 
-                            for (index, item) in self.ui_state.borrow_mut().prepared_items.iter_mut().enumerate() {
-                                ui.group(|ui| {
-                                    ui.label(&item.name);
-                                    ui.label(&item.kind);
-                                    ui.label(&item.rarity);
-                                    ui.label(&item.description);
-                                    ui.label(&item.flavor);
-                                });
+                        for (index, item) in self.ui_state.borrow_mut().prepared_items.iter_mut().enumerate() {
+                            ui.group(|ui| {
+                                ui.label(&item.name);
+                                ui.label(&item.kind);
+                                ui.label(&item.rarity);
+                                ui.label(&item.description);
+                                ui.label(&item.flavor);
 
-                                ui.add_space(30f32);
+                                ui.add_space(10f32);
 
                                 ui.horizontal(|ui| {
                                     if ui.button("Delete").clicked() {
                                         item_to_delete = Some(index);
                                     }
                                 });
-                            }
+                            });
 
-                            if let Some(index) = item_to_delete {
-                                self.ui_state.borrow_mut().prepared_items.remove(index);
-                            }
-                        });
+                            ui.add_space(30f32);
+                        }
+
+                        if let Some(index) = item_to_delete {
+                            self.ui_state.borrow_mut().prepared_items.remove(index);
+                        }
                     });
             });
-        }
-
-                    pub fn new(ui_state: Rc<RefCell<UiState>>) -> Self {
-            Self { ui_state }
-        }
+        });
     }
+
+    pub fn new(ui_state: Rc<RefCell<UiState>>) -> Self {
+        Self { ui_state }
+    }
+}
