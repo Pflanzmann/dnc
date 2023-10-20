@@ -133,6 +133,8 @@ impl InputPanel {
     fn preview(&mut self, ui: &mut egui::Ui) {}
 
     pub fn new(ui_state: Rc<RefCell<UiState>>) -> Self {
+        let current_path = env::current_dir();
+
         Self {
             ui_state,
             input1: String::new(),
@@ -141,7 +143,7 @@ impl InputPanel {
             input4: String::new(),
             input5: String::new(),
             script_path: "C:\\Users\\Ronny\\Documents\\Projects\\dnd5e_spell_overview\\scripts".to_string(),
-            output_path: "C:\\Users\\Ronny\\Documents\\Projects\\dnc\\output.pdf".to_string(),
+            output_path: format!("{}\\output.pdf", current_path.unwrap().to_str().unwrap()),
         }
     }
 }
