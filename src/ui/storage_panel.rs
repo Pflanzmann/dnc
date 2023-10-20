@@ -25,7 +25,7 @@ impl StoragePanel {
                         let mut item_to_chose: Option<usize> = None;
                         let mut item_to_delete: Option<usize> = None;
 
-                        for (index, item) in self.ui_state.borrow_mut().stored_items.iter_mut().enumerate() {
+                        for (index, item) in self.ui_state.borrow().stored_items.iter().enumerate() {
                             ui.group(|ui| {
                                 ui.label(&item.name);
                                 ui.label(&item.kind);
@@ -47,18 +47,19 @@ impl StoragePanel {
                             });
                         }
 
-                        if let Some(item) = item_to_chose {
-                            self.ui_state.borrow_mut().prepared_items.push(self.ui_state.borrow().stored_items[item].clone());
+                        if let Some(index) = item_to_chose {
+                            let item = self.ui_state.borrow().stored_items[index].clone();
+                            self.ui_state.borrow_mut().prepared_items.push(item);
                         }
 
                         if let Some(index) = item_to_delete {
-                            self.ui_state.borrow_mut().stored_items.remove(index);
+                            self.ui_state.borrow_mut().remove_stored_items(index);
                         }
                     });
                 });
         });
     }
-    
+
     pub fn new(ui_state: Rc<RefCell<UiState>>) -> Self {
         Self { ui_state }
     }

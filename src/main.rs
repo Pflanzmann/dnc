@@ -1,11 +1,9 @@
 use std::cell::RefCell;
-use std::io::Write;
-use std::ops::Deref;
 use std::rc::Rc;
 
 use eframe::*;
 
-use crate::models::item::Item;
+use crate::models::ui_state::UiState;
 use crate::storage::local_item_storage::LocalItemStorage;
 use crate::storage::storage::ItemStorage;
 use crate::ui::input_panel::InputPanel;
@@ -36,46 +34,16 @@ struct MyApp {
     storage_panel: StoragePanel,
     prepared_panel: PreparedPanel,
 
-    item_storage: LocalItemStorage,
+    item_storage: Rc<LocalItemStorage>,
 
     ui_state: Rc<RefCell<UiState>>,
 }
 
-pub struct UiState {
-    pub stored_items: Vec<Item>,
-    pub prepared_items: Vec<Item>,
-}
-
-impl UiState {
-    pub fn new() -> Self {
-        Self { stored_items: vec![], prepared_items: vec![] }
-    }
-}
-
 impl MyApp {
     pub fn new() -> Self {
-        let item1 = Item::new(
-            "Unrefined Blink Dagger".to_string(),
-            "dagger".to_string(),
-            "Rare".to_string(),
-            "**Teleportation**: As an action, you can throw this dagger to an unoccupied space within 60 feet. You instantly teleport to that location. \n\nUnpredictable Teleportation: After each teleport, there's a 25% chance the dagger breaks, becoming non-magical.".to_string(),
-            "This dagger crackles with unstable energy.".to_string(),
-        );
+        let storage = Rc::new(LocalItemStorage);
 
-        let item2 = Item::new(
-            "Ring Of Feather Falling".to_string(),
-            "Ring".to_string(),
-            "Rare".to_string(),
-            "When you fall while wearing this ring, you descend 60 feet per round and take no damage from falling.".to_string(),
-            "Its a cool looking ring.".to_string(),
-        );
-        let storage = LocalItemStorage;
-        let loaded_items: Vec<Item> = storage.load_items().unwrap_or_else(|_| vec![item1, item2]);
-
-        let mut ui_state = UiState::new();
-        ui_state.stored_items = loaded_items;
-
-        let ui_state = Rc::new(RefCell::new(UiState::new()));
+        let ui_state = Rc::new(RefCell::new(UiState::new(Rc::clone(&storage))));
 
         let input_panel = InputPanel::new(Rc::clone(&ui_state));
         let storage_panel = StoragePanel::new(Rc::clone(&ui_state));

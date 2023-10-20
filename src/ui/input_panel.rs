@@ -67,7 +67,7 @@ impl InputPanel {
                                 self.input4 = String::new();
                                 self.input5 = String::new();
 
-                                self.ui_state.borrow_mut().stored_items.push(new_item);
+                                self.ui_state.borrow_mut().push_stored_item(new_item);
                             }
 
                             ui.add_space(10f32);
@@ -92,7 +92,7 @@ impl InputPanel {
             });
         });
     }
-    
+
     pub fn new(ui_state: Rc<RefCell<UiState>>) -> Self {
         Self {
             ui_state,
