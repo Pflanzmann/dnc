@@ -5,6 +5,7 @@ use crate::storage::local_item_storage::LocalItemStorage;
 pub struct UiState {
     local_item_storage: Rc<LocalItemStorage>,
 
+    pub editing_item: Option<Item>,
     pub stored_items: Vec<Item>,
     pub prepared_items: Vec<Item>,
 }
@@ -31,7 +32,7 @@ impl UiState {
 
         Self {
             local_item_storage,
-
+            editing_item: None,
             stored_items: loaded_items,
             prepared_items: vec![],
         }

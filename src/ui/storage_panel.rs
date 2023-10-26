@@ -26,6 +26,7 @@ impl StoragePanel {
                     .auto_shrink([false; 2])
                     .show_viewport(ui, |ui, viewport| {
                         let mut item_to_chose: Option<usize> = None;
+                        let mut item_to_edit: Option<usize> = None;
                         let mut item_to_delete: Option<usize> = None;
 
                         for (index, item) in self.ui_state.borrow().stored_items.iter().enumerate() {
@@ -46,6 +47,10 @@ impl StoragePanel {
                                     if ui.button("Chose").clicked() {
                                         item_to_chose = Some(index);
                                     }
+
+                                    if ui.button("Edit").clicked() {
+                                        item_to_edit = Some(index);
+                                    }
                                 });
                             });
 
@@ -59,6 +64,11 @@ impl StoragePanel {
 
                         if let Some(index) = item_to_delete {
                             self.ui_state.borrow_mut().remove_stored_items(index);
+                        }
+
+                        if let Some(index) = item_to_edit {
+                            let item = self.ui_state.borrow().stored_items[index].clone();
+                            self.ui_state.borrow_mut().editing_item = Some(item);
                         }
                     });
             });

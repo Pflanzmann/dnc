@@ -23,6 +23,21 @@ pub struct InputPanel {
 
 impl InputPanel {
     pub fn show(&mut self, ui: &mut egui::Ui) {
+        if let Some(item) = self.ui_state.borrow().editing_item.clone() {
+            if self.input1.is_empty() &&
+                self.input2.is_empty() &&
+                self.input3.is_empty() &&
+                self.input4.is_empty() &&
+                self.input5.is_empty()
+            {
+                self.input1 = item.name;
+                self.input2 = item.kind;
+                self.input3 = item.rarity;
+                self.input4 = item.description;
+                self.input5 = item.flavor;
+            }
+        }
+
         ui.group(|ui| {
             ui.vertical(|ui| {
                 let width = ui.ctx().screen_rect().width();
@@ -78,6 +93,7 @@ impl InputPanel {
                                     self.input5 = String::new();
 
                                     self.ui_state.borrow_mut().push_stored_item(new_item);
+                                    self.ui_state.borrow_mut().editing_item = None;
                                 }
 
                                 if ui.add(egui::Button::new(
@@ -90,6 +106,8 @@ impl InputPanel {
                                     self.input3 = String::new();
                                     self.input4 = String::new();
                                     self.input5 = String::new();
+
+                                    self.ui_state.borrow_mut().editing_item = None;
                                 }
                             });
                         });
