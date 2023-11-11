@@ -5,9 +5,9 @@ use eframe::*;
 
 use crate::models::ui_state::UiState;
 use crate::storage::local_item_storage::LocalItemStorage;
-use crate::ui::input_panel::InputPanel;
-use crate::ui::prepared_panel::PreparedPanel;
-use crate::ui::storage_panel::StoragePanel;
+use crate::ui::input_panel::input_panel;
+use crate::ui::prepared_panel::prepared_panel;
+use crate::ui::storage_panel::storage_panel;
 
 pub mod models;
 mod ui;
@@ -29,29 +29,18 @@ fn main() {
 }
 
 struct MyApp {
-    input_panel: InputPanel,
-    storage_panel: StoragePanel,
-    prepared_panel: PreparedPanel,
-
     item_storage: Rc<LocalItemStorage>,
 
-    ui_state: Rc<RefCell<UiState>>,
+    ui_state: UiState,
 }
 
 impl MyApp {
     pub fn new() -> Self {
         let storage = Rc::new(LocalItemStorage);
 
-        let ui_state = Rc::new(RefCell::new(UiState::new(Rc::clone(&storage))));
-
-        let input_panel = InputPanel::new(Rc::clone(&ui_state));
-        let storage_panel = StoragePanel::new(Rc::clone(&ui_state));
-        let prepared_panel = PreparedPanel::new(Rc::clone(&ui_state));
+        let ui_state = UiState::new(Rc::clone(&storage));
 
         Self {
-            input_panel,
-            storage_panel,
-            prepared_panel,
             item_storage: storage,
             ui_state,
         }
@@ -65,15 +54,15 @@ impl App for MyApp {
                 ui.horizontal_centered(|ui| {
                     let width = ui.ctx().screen_rect().width();
 
-                    self.input_panel.show(ui);
+                    input_panel(ui, &mut self.ui_state);
 
                     ui.add_space(width * 0.01f32);
 
-                    self.storage_panel.show(ui);
+                    storage_panel(ui, &mut self.ui_state);
 
                     ui.add_space(width * 0.01f32);
 
-                    self.prepared_panel.show(ui);
+                    prepared_panel(ui, &mut self.ui_state);
                 })
             });
     }

@@ -1,3 +1,4 @@
+use std::env;
 use std::rc::Rc;
 use crate::models::item::Item;
 use crate::storage::local_item_storage::LocalItemStorage;
@@ -8,6 +9,14 @@ pub struct UiState {
     pub editing_item: Option<Item>,
     pub stored_items: Vec<Item>,
     pub prepared_items: Vec<Item>,
+
+    pub input1: String,
+    pub input2: String,
+    pub input3: String,
+    pub input4: String,
+    pub input5: String,
+    pub script_path: String,
+    pub output_path: String,
 }
 
 impl UiState {
@@ -30,12 +39,22 @@ impl UiState {
 
         let loaded_items: Vec<Item> = local_item_storage.load_items().unwrap_or_else(|_| vec![item1, item2]);
 
+        let current_path = env::current_dir();
+
         Self {
             local_item_storage,
             editing_item: None,
             stored_items: loaded_items,
             prepared_items: vec![],
-        }
+
+            input1: "".to_string(),
+            input2: "".to_string(),
+            input3: "".to_string(),
+            input4: "".to_string(),
+            input5: "".to_string(),
+
+            script_path: "C:\\Users\\Ronny\\Documents\\Projects\\dnd5e_spell_overview\\scripts".to_string(),
+            output_path: format!("{}\\output.pdf", current_path.unwrap().to_str().unwrap()),        }
     }
 
     pub fn push_stored_item(&mut self, item: Item) {
