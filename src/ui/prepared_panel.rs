@@ -1,48 +1,55 @@
-use egui::ScrollArea;
+use eframe::epaint::Color32;
+use egui::{RichText, ScrollArea};
 
 use crate::UiState;
 
 pub fn prepared_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
-    ui.vertical(|ui| {
-        ui.label("Chosen Items");
+    let width = ui.ctx().screen_rect().width();
 
-        ui.group(|ui| {
-            let width = ui.ctx().screen_rect().width();
-            let height = ui.ctx().screen_rect().height();
-
-            ui.set_width(width * 0.3f32);
-            ui.set_height(height * 0.9f32);
+    egui::SidePanel::left("prepared_panel")
+        .resizable(true)
+        .default_width(300.0)
+        .width_range(80.0..=width * 0.3f32)
+        .show_inside(ui, |ui| {
+            ui.vertical_centered(|ui| {
+                ui.heading("Chosen items");
+            });
 
             ScrollArea::vertical()
-                .id_source("Chosen")
+                .id_source("prepared_scroll_area")
                 .auto_shrink([false; 2])
                 .show_viewport(ui, |ui, viewport| {
                     let mut item_to_delete: Option<usize> = None;
 
                     for (index, item) in ui_state.prepared_items.iter_mut().enumerate() {
                         ui.group(|ui| {
-                            ui.label(&item.name);
-                            ui.label(&item.kind);
-                            ui.label(&item.rarity);
-                            ui.label(&item.description);
-                            ui.label(&item.flavor);
+                            let width = ui.available_width();
+                            ui.set_width(width);
 
-                            ui.add_space(10f32);
+                            ui.label(RichText::new(&item.name)
+                                .color(Color32::from_rgb(0, 0, 0))
+                                .size(16.0)
+                            );
+
+                            ui.add_space(5.0);
 
                             ui.horizontal(|ui| {
                                 if ui.button("Delete").clicked() {
                                     item_to_delete = Some(index);
                                 }
+
+                                if ui.button("Preview").clicked() {
+                                    ui_state.preview_item = Some(item.clone());
+                                }
                             });
                         });
 
-                        ui.add_space(30f32);
+                        ui.add_space(5f32);
                     }
 
                     if let Some(index) = item_to_delete {
-                        ui_state.prepared_items.remove(index);
+                        ui_state.remove_prepared_items(index);
                     }
                 });
         });
-    });
 }

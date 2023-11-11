@@ -1,14 +1,17 @@
 use std::env;
 use std::rc::Rc;
+
 use crate::models::item::Item;
 use crate::storage::local_item_storage::LocalItemStorage;
 
 pub struct UiState {
     local_item_storage: Rc<LocalItemStorage>,
+    prepared_item_storage: Rc<LocalItemStorage>,
 
     pub editing_item: Option<Item>,
     pub stored_items: Vec<Item>,
     pub prepared_items: Vec<Item>,
+    pub preview_item: Option<Item>,
 
     pub input1: String,
     pub input2: String,
@@ -20,7 +23,7 @@ pub struct UiState {
 }
 
 impl UiState {
-    pub fn new(local_item_storage: Rc<LocalItemStorage>) -> Self {
+    pub fn new(local_item_storage: Rc<LocalItemStorage>, prepared_item_storage: Rc<LocalItemStorage>) -> Self {
         let item1 = Item::new(
             "Unrefined Blink Dagger".to_string(),
             "dagger".to_string(),
@@ -37,15 +40,18 @@ impl UiState {
             "Its a cool looking ring.".to_string(),
         );
 
-        let loaded_items: Vec<Item> = local_item_storage.load_items().unwrap_or_else(|_| vec![item1, item2]);
+        let stored_items: Vec<Item> = local_item_storage.load_items().unwrap_or_else(|_| vec![item1, item2]);
+        let prepared_items: Vec<Item> = prepared_item_storage.load_items().unwrap_or_else(|_| vec![]);
 
         let current_path = env::current_dir();
 
         Self {
             local_item_storage,
+            prepared_item_storage,
             editing_item: None,
-            stored_items: loaded_items,
-            prepared_items: vec![],
+            stored_items,
+            prepared_items,
+            preview_item: None,
 
             input1: "".to_string(),
             input2: "".to_string(),
@@ -54,22 +60,35 @@ impl UiState {
             input5: "".to_string(),
 
             script_path: "C:\\Users\\Ronny\\Documents\\Projects\\dnd5e_spell_overview\\scripts".to_string(),
-            output_path: format!("{}\\output.pdf", current_path.unwrap().to_str().unwrap()),        }
+            output_path: format!("{}\\output.pdf", current_path.unwrap().to_str().unwrap()),
+        }
     }
 
     pub fn push_stored_item(&mut self, item: Item) {
         self.stored_items.push(item);
 
-        let stored_items = &self.stored_items;
-        self.local_item_storage.store_items(stored_items)
+        self.local_item_storage.store_items(&self.stored_items)
             .expect("Could not store items");
     }
 
     pub fn remove_stored_items(&mut self, index: usize) {
         self.stored_items.remove(index);
 
-        let stored_items = &self.stored_items;
-        self.local_item_storage.store_items(stored_items)
+        self.local_item_storage.store_items(&self.stored_items)
+            .expect("Could not store items");
+    }
+
+    pub fn push_prepared_item(&mut self, item: Item) {
+        self.prepared_items.push(item);
+
+        self.prepared_item_storage.store_items(&self.prepared_items)
+            .expect("Could not store items");
+    }
+
+    pub fn remove_prepared_items(&mut self, index: usize) {
+        self.prepared_items.remove(index);
+
+        self.prepared_item_storage.store_items(&self.prepared_items)
             .expect("Could not store items");
     }
 }

@@ -1,20 +1,22 @@
-use egui::ScrollArea;
+use eframe::epaint::Color32;
+use egui::{RichText, ScrollArea};
 
 use crate::UiState;
 
-pub fn storage_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
-    ui.vertical(|ui| {
-        ui.label("Available Items");
+pub fn stored_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
+    let width = ui.ctx().screen_rect().width();
 
-        ui.group(|ui| {
-            let width = ui.ctx().screen_rect().width();
-            let height = ui.ctx().screen_rect().height();
-
-            ui.set_width(width * 0.3f32);
-            ui.set_height(height * 0.9f32);
+    egui::SidePanel::left("stored_panel")
+        .resizable(true)
+        .default_width(300.0)
+        .width_range(80.0..=width * 0.3f32)
+        .show_inside(ui, |ui| {
+            ui.vertical_centered(|ui| {
+                ui.heading("Available items");
+            });
 
             ScrollArea::vertical()
-                .id_source("Available")
+                .id_source("stored_scroll_area")
                 .auto_shrink([false; 2])
                 .show_viewport(ui, |ui, viewport| {
                     let mut item_to_chose: Option<usize> = None;
@@ -23,13 +25,15 @@ pub fn storage_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
 
                     for (index, item) in ui_state.stored_items.iter().enumerate() {
                         ui.group(|ui| {
-                            ui.label(&item.name);
-                            ui.label(&item.kind);
-                            ui.label(&item.rarity);
-                            ui.label(&item.description);
-                            ui.label(&item.flavor);
+                            let width = ui.available_width();
+                            ui.set_width(width);
 
-                            ui.add_space(10f32);
+                            ui.label(RichText::new(&item.name)
+                                .color(Color32::from_rgb(0, 0, 0))
+                                .size(16.0)
+                            );
+
+                            ui.add_space(5f32);
 
                             ui.horizontal(|ui| {
                                 if ui.button("Delete").clicked() {
@@ -43,15 +47,19 @@ pub fn storage_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
                                 if ui.button("Edit").clicked() {
                                     item_to_edit = Some(index);
                                 }
+
+                                if ui.button("Preview").clicked() {
+                                    ui_state.preview_item = Some(item.clone());
+                                }
                             });
                         });
 
-                        ui.add_space(30f32);
+                        ui.add_space(5f32);
                     }
 
                     if let Some(index) = item_to_chose {
                         let item = ui_state.stored_items[index].clone();
-                        ui_state.prepared_items.push(item);
+                        ui_state.push_prepared_item(item);
                     }
 
                     if let Some(index) = item_to_delete {
@@ -64,5 +72,4 @@ pub fn storage_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
                     }
                 });
         });
-    });
 }

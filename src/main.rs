@@ -1,13 +1,13 @@
-use std::cell::RefCell;
 use std::rc::Rc;
 
 use eframe::*;
 
 use crate::models::ui_state::UiState;
 use crate::storage::local_item_storage::LocalItemStorage;
-use crate::ui::input_panel::input_panel;
+use crate::ui::edit_panel::edit_panel;
 use crate::ui::prepared_panel::prepared_panel;
-use crate::ui::storage_panel::storage_panel;
+use crate::ui::preview_panel::preview_panel;
+use crate::ui::stored_panel::stored_panel;
 
 pub mod models;
 mod ui;
@@ -30,18 +30,21 @@ fn main() {
 
 struct MyApp {
     item_storage: Rc<LocalItemStorage>,
+    prepared_storage: Rc<LocalItemStorage>,
 
     ui_state: UiState,
 }
 
 impl MyApp {
     pub fn new() -> Self {
-        let storage = Rc::new(LocalItemStorage);
+        let item_storage = Rc::new(LocalItemStorage::new("stored_items.json".to_string()));
+        let prepared_storage = Rc::new(LocalItemStorage::new("magic_item_list.json".to_string()));
 
-        let ui_state = UiState::new(Rc::clone(&storage));
+        let ui_state = UiState::new(Rc::clone(&item_storage), Rc::clone(&prepared_storage));
 
         Self {
-            item_storage: storage,
+            item_storage,
+            prepared_storage,
             ui_state,
         }
     }
@@ -54,15 +57,19 @@ impl App for MyApp {
                 ui.horizontal_centered(|ui| {
                     let width = ui.ctx().screen_rect().width();
 
-                    input_panel(ui, &mut self.ui_state);
+                    edit_panel(ui, &mut self.ui_state);
 
                     ui.add_space(width * 0.01f32);
 
-                    storage_panel(ui, &mut self.ui_state);
+                    stored_panel(ui, &mut self.ui_state);
 
                     ui.add_space(width * 0.01f32);
 
                     prepared_panel(ui, &mut self.ui_state);
+
+                    ui.add_space(width * 0.01f32);
+
+                    preview_panel(ui, &mut self.ui_state);
                 })
             });
     }
