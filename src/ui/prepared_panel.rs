@@ -1,5 +1,6 @@
+use eframe::emath::Vec2;
 use eframe::epaint::Color32;
-use egui::{RichText, ScrollArea};
+use egui::{Margin, RichText, ScrollArea};
 
 use crate::UiState;
 
@@ -10,6 +11,12 @@ pub fn prepared_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
         .resizable(true)
         .default_width(300.0)
         .width_range(80.0..=width * 0.3f32)
+        .frame(egui::Frame {
+            fill: Color32::WHITE,
+            inner_margin: Margin::symmetric(0.0, 0.0),
+            outer_margin: Margin::symmetric(0.0, 0.0),
+            ..Default::default()
+        })
         .show_inside(ui, |ui| {
             ui.vertical_centered(|ui| {
                 ui.heading("Chosen items");

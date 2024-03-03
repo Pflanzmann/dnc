@@ -1,5 +1,7 @@
+use eframe::emath::Vec2;
 use eframe::epaint::Color32;
-use egui::{RichText, ScrollArea};
+use egui::{Margin, RichText, ScrollArea};
+use egui::Shape::Vec;
 
 use crate::UiState;
 
@@ -9,7 +11,13 @@ pub fn stored_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
     egui::SidePanel::left("stored_panel")
         .resizable(true)
         .default_width(300.0)
-        .width_range(80.0..=width * 0.3f32)
+        .width_range(0.0..=width * 0.3f32)
+        .frame(egui::Frame {
+            fill: Color32::WHITE,
+            inner_margin: Margin::symmetric(0.0, 0.0),
+            outer_margin: Margin::symmetric(0.0, 0.0),
+            ..Default::default()
+        })
         .show_inside(ui, |ui| {
             ui.vertical_centered(|ui| {
                 ui.heading("Available items");
@@ -28,9 +36,10 @@ pub fn stored_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
                             let width = ui.available_width();
                             ui.set_width(width);
 
-                            ui.label(RichText::new(&item.name)
-                                .color(Color32::from_rgb(0, 0, 0))
-                                .size(16.0)
+                            ui.label(
+                                RichText::new(&item.name)
+                                    .color(Color32::from_rgb(0, 0, 0))
+                                    .size(16.0)
                             );
 
                             ui.add_space(5f32);

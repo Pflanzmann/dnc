@@ -1,10 +1,13 @@
 use std::rc::Rc;
 
 use eframe::*;
+use eframe::emath::Vec2;
+use egui::Margin;
 
 use crate::models::ui_state::UiState;
 use crate::storage::local_item_storage::LocalItemStorage;
 use crate::ui::edit_panel::edit_panel;
+use crate::ui::menu_panel::menu_panel;
 use crate::ui::prepared_panel::prepared_panel;
 use crate::ui::preview_panel::preview_panel;
 use crate::ui::stored_panel::stored_panel;
@@ -54,23 +57,17 @@ impl App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut Frame) {
         egui::CentralPanel::default()
             .show(ctx, |ui| {
-                ui.horizontal_centered(|ui| {
-                    let width = ui.ctx().screen_rect().width();
+                menu_panel(ui, &mut self.ui_state);
 
-                    edit_panel(ui, &mut self.ui_state);
+                if self.ui_state.show_new_item_window {
+                    self.ui_state.show_new_item_window = edit_panel(ui, &mut self.ui_state);
+                }
 
-                    ui.add_space(width * 0.01f32);
+                stored_panel(ui, &mut self.ui_state);
 
-                    stored_panel(ui, &mut self.ui_state);
+                prepared_panel(ui, &mut self.ui_state);
 
-                    ui.add_space(width * 0.01f32);
-
-                    prepared_panel(ui, &mut self.ui_state);
-
-                    ui.add_space(width * 0.01f32);
-
-                    preview_panel(ui, &mut self.ui_state);
-                })
+                preview_panel(ui, &mut self.ui_state);
             });
     }
 }

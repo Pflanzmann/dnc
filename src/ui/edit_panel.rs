@@ -4,12 +4,12 @@ use std::io::Write;
 use std::process::Command;
 
 use eframe::epaint::Color32;
-use egui::RichText;
+use egui::{RichText, Window};
 
 use crate::models::item::Item;
 use crate::UiState;
 
-pub fn edit_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
+pub fn edit_panel(ui: &mut egui::Ui, ui_state: &mut UiState) -> bool {
     if let Some(item) = ui_state.editing_item.clone() {
         if ui_state.input1.is_empty() &&
             ui_state.input2.is_empty() &&
@@ -22,16 +22,27 @@ pub fn edit_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
             ui_state.input3 = item.rarity;
             ui_state.input4 = item.description;
             ui_state.input5 = item.flavor;
+
+            ui_state.editing_item = None;
         }
     }
 
     let width = ui.ctx().screen_rect().width();
 
-    egui::SidePanel::left("edit_panel")
-        .resizable(true)
-        .default_width(300.0)
-        .width_range(80.0..=width * 0.3f32)
-        .show_inside(ui, |ui| {
+    let screen_rect = ui.ctx().available_rect();
+    let window_size = egui::vec2(450.0, 600.0); // Your desired window size
+    let window_position = screen_rect.center() - window_size / 1.5;
+
+    let mut open = true;
+    let mut close = false;
+
+    Window::new("Edit Item")
+        .resizable(false)
+        .default_size(window_size)
+        .default_pos(window_position)
+        .open(&mut open)
+        .collapsible(false)
+        .show(ui.ctx(), |ui| {
             ui.vertical_centered(|ui| {
                 ui.heading("New Item");
             });
@@ -45,6 +56,7 @@ pub fn edit_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
             ui.label("Type");
             ui.add(egui::TextEdit::multiline(&mut ui_state.input2).desired_width(f32::INFINITY));
             ui.add_space(space_between_boxes);
+
             ui.label("Rarity");
             ui.add(egui::TextEdit::multiline(&mut ui_state.input3).desired_width(f32::INFINITY));
             ui.add_space(space_between_boxes);
@@ -78,7 +90,7 @@ pub fn edit_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
                     ui_state.input5 = String::new();
 
                     ui_state.push_stored_item(new_item);
-                    ui_state.editing_item = None;
+                    close = true
                 }
 
                 if ui.add(egui::Button::new(
@@ -91,39 +103,13 @@ pub fn edit_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
                     ui_state.input3 = String::new();
                     ui_state.input4 = String::new();
                     ui_state.input5 = String::new();
-
-                    ui_state.editing_item = None;
                 }
             });
-
-            if ui.add(egui::Button::new(
-                RichText::new("Export as PDF")
-                    .color(Color32::from_rgb(0, 0, 0))
-                    .size(24.0))
-            ).clicked() {
-                let data = serde_json::to_string(&ui_state.prepared_items);
-
-                let mut file = File::create("prepared_items.json").unwrap();
-                file.write_all(data.unwrap().as_bytes());
-
-                let current_path = env::current_dir();
-
-                Command::new("python")
-                    .arg("magic_item_cards.py")
-                    .args([&format!("p{}\\prepared_items.json", current_path.unwrap().to_str().unwrap()), &format!("o{}", &ui_state.output_path)])
-                    .current_dir(&ui_state.script_path)
-                    .output()
-                    .expect("Failed to execute command");
-            }
-
-            ui.add_space(30f32);
-
-            ui.label("Script path");
-            ui.text_edit_singleline(&mut ui_state.script_path);
-
-            ui.add_space(10f32);
-
-            ui.label("Output path");
-            ui.text_edit_singleline(&mut ui_state.output_path);
         });
+
+    if close {
+        false
+    } else {
+        open
+    }
 }

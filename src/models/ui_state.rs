@@ -13,6 +13,7 @@ pub struct UiState {
     pub prepared_items: Vec<Item>,
     pub preview_item: Option<Item>,
 
+    pub show_new_item_window: bool,
     pub input1: String,
     pub input2: String,
     pub input3: String,
@@ -53,6 +54,7 @@ impl UiState {
             prepared_items,
             preview_item: None,
 
+            show_new_item_window: false,
             input1: "".to_string(),
             input2: "".to_string(),
             input3: "".to_string(),
