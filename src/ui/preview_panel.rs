@@ -1,12 +1,3 @@
-use std::env;
-use std::fs::File;
-use std::io::Write;
-use std::process::Command;
-
-use eframe::epaint::Color32;
-use egui::RichText;
-
-use crate::models::item::Item;
 use crate::UiState;
 
 pub fn preview_panel(ui: &mut egui::Ui, ui_state: &mut UiState) {
